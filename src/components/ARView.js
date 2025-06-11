@@ -19,11 +19,11 @@ function ARView() {
   let scene, camera, renderer;
 
   let models = [
-    "./Kabinet_AjengDiahPramesti.glb",
-    "./Kasur_HariOctavianDelrossi.glb", 
-    "./Lemari_FarlyhaydyH.Djalil.glb",
-    "./Meja_TrisnaCahyaPermadi.glb",
-    "./Qohary_Lamp.glb",
+    "/Kabinet_AjengDiahPramesti.glb",
+    "/Kasur_HariOctavianDelrossi.glb", 
+    "/Lemari_FarlyhaydyH.Djalil.glb",
+    "/Meja_TrisnaCahyaPermadi.glb",
+    "/Qohary_Lamp.glb",
   ];
   let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
   let items = [];
