@@ -1,16 +1,15 @@
 import React from 'react';
 import './FurnitureCard.css';
+import { Link } from 'react-router-dom';
 
-function FurnitureCard({ name, image, onClick }) {
+function FurnitureCard({ item, index}) {
   return (
     <div className="furniture-card">
-      <img src={image} alt={name} className="card-image" />
-      <div className="card-info">
-        <h3 className="card-title">{name}</h3>
-        <button className="card-button" onClick={onClick}>
-          Lihat Tampilan
-        </button>
-      </div>
+      <img src={item.image} alt={item.name} className="card-image" />
+        <h3 className="card-title">{item.name}</h3>
+        <Link to={`/arview/${index}`} className="btn-theme">
+            Lihat Tampilan
+        </Link>
     </div>
   );
 }

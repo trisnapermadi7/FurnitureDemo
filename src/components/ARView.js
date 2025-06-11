@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 // import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -9,12 +9,17 @@ import './ARView.css';
 function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [navbarOpen, setNavbarOpen] = useState(true);
+  const [navbarOpen, setNavbarOpen] = useState(false);
   const [arSupported, setArSupported] = useState(true);
+  const [itemSelectedIndex, setItemSelectedIndex] = useState(Number(id) || 0);
 
-  let reticle;
-  let hitTestSource = null;
-  let hitTestSourceRequested = false;
+  const itemsRef = useRef([]);
+  const sceneRef = useRef();
+  const rendererRef = useRef();
+  const cameraRef = useRef();
+  const reticleRef = useRef();
+  const hitTestSourceRef = useRef(null);
+  const hitTestSourceRequestedRef = useRef(false);
 
   let scene, camera, renderer;
 
@@ -27,8 +32,6 @@ function ARView() {
     "/Armchair_PiolaEvania.glb",
   ];
   let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
-  let items = [];
-  let itemSelectedIndex = 0;
 
   // Cek support AR hanya sekali saat mount
   useEffect(() => {
@@ -43,19 +46,22 @@ function ARView() {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    setItemSelectedIndex(Number(id) || 0);
+    setNavbarOpen(false);
+
     init();
     setupFurnitureSelection();
     animate();
 
-    const backButton = document.createElement('button');
-    backButton.textContent = 'Back to Gallery';
-    backButton.className = 'back-button';
-    backButton.onclick = () => navigate('/furniture');
-    document.body.appendChild(backButton);
+    // const backButton = document.createElement('button');
+    // backButton.textContent = 'Back to Gallery';
+    // backButton.className = 'back-button';
+    // backButton.onclick = () => navigate('/furniture');
+    // document.body.appendChild(backButton);
 
-    return () => {
-      document.body.removeChild(backButton);
-    };
+    // return () => {
+    //   document.body.removeChild(backButton);
+    // };
   }, [id, navigate]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
@@ -104,11 +110,12 @@ function ARView() {
     // arButton.style.bottom = "22%";
     // document.body.appendChild(arButton);
 
+    itemsRef.current = [];
     for (let i = 0; i < models.length; i++) {
       const loader = new GLTFLoader();
       loader.load(models[i], function (glb) {
         let model = glb.scene;
-        items[i] = model;
+        itemsRef.current[i] = model;
       });
     }
 
@@ -116,20 +123,27 @@ function ARView() {
     controller.addEventListener("select", onSelect);
     scene.add(controller);
 
-    reticle = new THREE.Mesh(
+    const reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial()
     );
     reticle.matrixAutoUpdate = false;
     reticle.visible = false;
     scene.add(reticle);
+
+    sceneRef.current = scene;
+    cameraRef.current = camera;
+    rendererRef.current = renderer;
+    reticleRef.current = reticle;
+    hitTestSourceRef.current = null;
+    hitTestSourceRequestedRef.current = false;
   }
 
   function onSelect() {
-    if (reticle.visible) {
-      let newModel = items[itemSelectedIndex].clone();
+    if (reticleRef.current.visible) {
+      let newModel = itemsRef.current[itemSelectedIndex].clone();
       newModel.visible = true;
-      reticle.matrix.decompose(
+      reticleRef.current.matrix.decompose(
         newModel.position,
         newModel.quaternion,
         newModel.scale
@@ -151,14 +165,14 @@ function ARView() {
         el.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          onClicked(e, items[i], i);
+          onClicked(e, itemsRef.current[i], i);
         });
       }
     }
   }
 
-  const onClicked = (e, selectItem, index) => {
-    itemSelectedIndex = index;
+  const onClicked = (e, index) => {
+    setItemSelectedIndex(index);
     for (let i = 0; i < models.length; i++) {
       const el = document.querySelector(`#item` + i);
       if (el) el.classList.remove("clicked");
@@ -171,29 +185,34 @@ function ARView() {
   }
 
   function render(timestamp, frame) {
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+    const reticle = reticleRef.current;
+
     if (frame) {
       const referenceSpace = renderer.xr.getReferenceSpace();
       const session = renderer.xr.getSession();
 
-      if (hitTestSourceRequested === false) {
+      if (hitTestSourceRequestedRef === false) {
         session.requestReferenceSpace("viewer").then(function (referenceSpace) {
           session
             .requestHitTestSource({ space: referenceSpace })
             .then(function (source) {
-              hitTestSource = source;
+              hitTestSourceRef.current = source;
             });
         });
 
         session.addEventListener("end", function () {
-          hitTestSourceRequested = false;
-          hitTestSource = null;
+          hitTestSourceRequestedRef.current = false;
+          hitTestSourceRef.current = null;
         });
 
-        hitTestSourceRequested = true;
+        hitTestSourceRequestedRef.current = true;
       }
 
-      if (hitTestSource) {
-        const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestSourceRef.current) {
+        const hitTestResults = frame.getHitTestResults(hitTestSourceRef.current);
         if (hitTestResults.length) {
           const hit = hitTestResults[0];
           reticle.visible = true;
@@ -208,6 +227,12 @@ function ARView() {
 
   return (
     <div className="ar-view">
+      <button
+        className="btn-theme back-to-gallery-btn"
+        onClick={() => navigate('/furniture')}
+      >
+        ← Back to Gallery
+      </button>
       <canvas id="canvas"></canvas>
       {/* AR Status */}
       {!arSupported && (
@@ -246,7 +271,7 @@ function ARView() {
           </div>
           <div className="button-container">
             <img className="button-image" id="item5" src="/Sofa.png" alt="Sofa" />
-            <div className="item-label">Armchairr</div>
+            <div className="item-label">Armchair</div>
           </div>
         </div>
       </div>

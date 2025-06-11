@@ -11,7 +11,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/furniture" element={<FurnitureList />} />
-        <Route path="/ar/:id" element={<ARView />} />
+        {/* <Route path="/ar/:id" element={<ARView />} /> */}
+        <Route path="/arview/:id" element={<ARView />} />
       </Routes>
     </Router>
   );

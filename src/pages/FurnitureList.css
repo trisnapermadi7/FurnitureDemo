@@ -1,39 +1,43 @@
 .furniture-list-container {
-  padding: 32px 24px;
-  background: #f7fafc;
   min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  padding-bottom: 2rem;
 }
 
-.list-header {
+.furniture-list-header {
   text-align: center;
-  margin-bottom: 40px;
+  padding: 2.5rem 1rem 1.5rem 1rem;
 }
 
-.list-header h2 {
-  font-size: 2.5rem;
+.furniture-list-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
   color: #2d3748;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
-.list-header p {
+.furniture-list-header p {
   color: #4a5568;
   font-size: 1.1rem;
+  margin-bottom: 0;
 }
 
 .furniture-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 1.5rem 1rem 0 1rem;
 }
 
-@media (max-width: 640px) {
-  .furniture-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 600px) {
+  .furniture-list-header h2 {
+    font-size: 1.3rem;
   }
-  
-  .list-header h2 {
-    font-size: 2rem;
+  .furniture-grid {
+    gap: 1rem;
+    padding: 1rem 0.2rem 0 0.2rem;
   }
 }
