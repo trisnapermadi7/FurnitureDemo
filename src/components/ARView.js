@@ -24,6 +24,7 @@ function ARView() {
     "/Lemari_FarlyhaydyH.Djalil.glb",
     "/Meja_TrisnaCahyaPermadi.glb",
     "/Qohary_Lamp.glb",
+    "/Armchair_PiolaEvania (1).glb",
   ];
   let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
   let items = [];
@@ -242,6 +243,10 @@ function ARView() {
           <div className="button-container">
             <img className="button-image" id="item4" src="/Lamp.png" alt="Lamp" />
             <div className="item-label">Lamp</div>
+          </div>
+          <div className="button-container">
+            <img className="button-image" id="item5" src="/Sofa.png" alt="Sofa" />
+            <div className="item-label">Armcahir</div>
           </div>
         </div>
       </div>

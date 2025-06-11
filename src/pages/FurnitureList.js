@@ -34,7 +34,12 @@ const furnitureData = [
     price: 249,
     image: "/Lamp.png"
   },
-  // Add more furniture items here
+  {
+    id: 5,
+    name: "Sofa",
+    price: 249,
+    image: "/Sofa.png"
+  },
 ];
 
 function FurnitureList() {
