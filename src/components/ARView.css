@@ -1,0 +1,138 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+#canvas {
+  width: 100%;
+  height: 85vh;
+}
+
+.navbar {
+  background-color: #333;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 21vh;
+  transition: height 0.3s;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.navbar.closed {
+  height: 40px; /* Hanya tinggi tombol toggle */
+}
+
+.navbar-toggle {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #eaeef4;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  z-index: 101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.arrow {
+  font-size: 20px;
+  color: #333;
+}
+
+.navbar.closed .button-list {
+  display: none;
+}
+
+.navbar .button-image {
+  display: inline-block;
+  text-align: center;
+  padding: 1em 0.5em;
+  width: 100px;
+  height: 100px;
+}
+
+.clicked {
+  border: 2px;
+  color: white;
+  border-style: solid;
+}
+
+.navbar-heading {
+  color: #fff;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.button-list {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 8px;
+  gap: 10px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Pastikan label di atas */
+  width: 110px;
+  margin-bottom: 10px;
+  padding-top: 5px; /* Tambahkan jarak atas jika perlu */
+}
+
+.item-label {
+  font-size: 0.95em;
+  color: #fff;
+  margin-bottom: 4px;   /* Jarak ke gambar di bawahnya */
+  margin-top: 0;        /* Pastikan tidak ada margin atas */
+  font-weight: 500;
+  white-space: normal;
+  word-break: break-word;
+  min-height: 2em;      /* Agar label tidak terlalu mepet */
+}
+
+.button-image {
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+  background: #444;
+  padding: 4px;
+  margin-top: 7px;
+}
+
+.ar-status {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #eee;
+  color: #888;
+  font-weight: bold;
+  padding: 8px 18px;
+  border-radius: 6px;
+  bottom: 23vh; /* posisi saat navbar open */
+  z-index: 200;
+  transition: bottom 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.ar-status.closed {
+  bottom: 45px; /* posisi saat navbar closed */
+}
