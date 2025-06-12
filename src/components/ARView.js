@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
-// import { ARButton } from 'three/examples/jsm/webxr/ARButton';
+import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { XREstimatedLight } from 'three/examples/jsm/webxr/XREstimatedLight';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -96,13 +96,13 @@ function ARView() {
       scene.remove(xrLight);
     });
 
-    // let arButton = ARButton.createButton(renderer, {
-    //   requiredFeatures: ["hit-test"],
-    //   optionalFeatures: ["dom-overlay", "light-estimation"],
-    //   domOverlay: { root: document.body },
-    // });
-    // arButton.style.bottom = "22%";
-    // document.body.appendChild(arButton);
+    let arButton = ARButton.createButton(renderer, {
+      requiredFeatures: ["hit-test"],
+      optionalFeatures: ["dom-overlay", "light-estimation"],
+      domOverlay: { root: document.body },
+    });
+    arButton.style.bottom = "22%";
+    document.body.appendChild(arButton);
 
     for (let i = 0; i < models.length; i++) {
       const loader = new GLTFLoader();
