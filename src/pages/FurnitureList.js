@@ -67,3 +67,6 @@ function FurnitureList() {
 }
 
 export default FurnitureList;
+
+
+
