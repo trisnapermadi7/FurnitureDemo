@@ -48,8 +48,10 @@ function FurnitureList() {
   return (
     <div className="furniture-list-container">
       <header className="list-header">
-        <h2>Our Furniture Collection</h2>
-        <p>Click on any item to view in AR</p>
+        <h2>
+          <span role="img" aria-label="furniture">🪑</span> Furniture Collection
+        </h2>
+        <p>Click on any item to view in Augmented Reality!</p>
       </header>
       <div className="furniture-grid">
         {furnitureData.map((item) => (

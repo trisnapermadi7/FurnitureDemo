@@ -71,14 +71,13 @@ body {
 .home-header h1 {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #141c29;
   margin-bottom: 20px;
   line-height: 1.2;
 }
 
 .home-header p {
   font-size: 1.25rem;
-  color: #475569;
   color: black;
   max-width: 600px;
   margin: 0 auto 40px;
@@ -88,7 +87,7 @@ body {
   display: inline-block;
   padding: 14px 36px;
   font-size: 1.1rem;
-  background: #3b82f6;
+  background: linear-gradient(90deg, #667eea 0%, #5a67d8 100%);;
   color: #fff;
   text-decoration: none;
   border-radius: 10px;
@@ -98,8 +97,8 @@ body {
 }
 
 .home-button:hover {
-  background: #2563eb;
-  transform: translateY(-3px) scale(1.02);
+  background: linear-gradient(90deg, #5a67d8 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
   box-shadow: 0 12px 20px rgba(59, 130, 246, 0.4);
 }
 

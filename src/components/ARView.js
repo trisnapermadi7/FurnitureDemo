@@ -9,7 +9,7 @@ import './ARView.css';
 function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [navbarOpen, setNavbarOpen] = useState(true);
+  const [navbarOpen, setNavbarOpen] = useState(false)
   const [arSupported, setArSupported] = useState(true);
 
   let reticle;
@@ -47,15 +47,15 @@ function ARView() {
     setupFurnitureSelection();
     animate();
 
-    const backButton = document.createElement('button');
-    backButton.textContent = 'Back to Gallery';
-    backButton.className = 'back-button';
-    backButton.onclick = () => navigate('/furniture');
-    document.body.appendChild(backButton);
+    // const backButton = document.createElement('button');
+    // backButton.textContent = 'Back to Gallery';
+    // backButton.className = 'back-button';
+    // backButton.onclick = () => navigate('/furniture');
+    // document.body.appendChild(backButton);
 
-    return () => {
-      document.body.removeChild(backButton);
-    };
+    // return () => {
+    //   document.body.removeChild(backButton);
+    // };
   }, [id, navigate]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
@@ -208,6 +208,12 @@ function ARView() {
 
   return (
     <div className="ar-view">
+      <button
+        className="back-to-gallery-btn"
+        onClick={() => navigate('/furniture')}
+      >
+        ← Back to Gallery
+      </button>
       <canvas id="canvas"></canvas>
       {/* AR Status */}
       {!arSupported && (

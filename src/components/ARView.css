@@ -136,3 +136,76 @@ code {
 .ar-status.closed {
   bottom: 45px; /* posisi saat navbar closed */
 }
+
+.arview-product-info {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: rgba(60,60,60,0.92);
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  padding: 32px 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 120;
+}
+
+.arview-product-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #fff;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.arview-product-meta {
+  color: #fff;
+  text-align: center;
+}
+
+.arview-product-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.arview-product-size {
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.arview-product-desc {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.back-to-gallery-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+  background: linear-gradient(90deg, #667eea 0%, #5a67d8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.7rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(90, 103, 216, 0.12);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-to-gallery-btn:hover,
+.back-to-gallery-btn:focus {
+  background: linear-gradient(90deg, #5a67d8 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+}

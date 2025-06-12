@@ -32,7 +32,7 @@ function HomePage() {
     <div className="home-container">
       <header className="home-header">
         <h1>🛋️ WebXR Furniture Viewer</h1>
-        <p>Experience how furniture fits in your space using immersive Augmented Reality.</p>
+        <p>Experience furniture fits in your space using <b>Augmented Reality</b></p>
       </header>
       <div className="home-content">
         <Link to="/furniture" className="home-button">
