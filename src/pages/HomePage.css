@@ -44,6 +44,25 @@
   margin-bottom: 1rem;
 }
 
+.home-button {
+  display: inline-block;
+  background: linear-gradient(90deg, #667eea 0%, #5a67d8 100%);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 0.9rem 2.2rem;
+  border-radius: 2rem;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(90, 103, 216, 0.12);
+  transition: background 0.2s, transform 0.2s;
+  margin-top: 0.5rem;
+}
+
+.home-button:hover, .home-button:focus {
+  background: linear-gradient(90deg, #5a67d8 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
 .home-footer {
   text-align: center;
   padding: 1rem 0 0.5rem 0;
