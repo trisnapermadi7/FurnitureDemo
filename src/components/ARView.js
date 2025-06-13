@@ -9,6 +9,7 @@ import furnitureData from '../data/furnitureData';
 
 function ARView() {
   const { id } = useParams();
+  const itemSelectedIndex = Number(id);
   const navigate = useNavigate();
   const [arSupported, setArSupported] = useState(true);
 
@@ -127,7 +128,6 @@ function ARView() {
   ];
   let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
   let items = [];
-  let itemSelectedIndex = 0;
 
   // Cek support AR hanya sekali saat mount
 
@@ -164,7 +164,6 @@ function ARView() {
   }
 
   const onClicked = (e, selectItem, index) => {
-    itemSelectedIndex = index;
     for (let i = 0; i < models.length; i++) {
       const el = document.querySelector(`#item` + i);
       if (el) el.classList.remove("clicked");
