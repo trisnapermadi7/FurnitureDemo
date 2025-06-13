@@ -49,6 +49,27 @@ function ARView() {
     init();
     setupFurnitureSelection();
     animate();
+
+    return () => {
+      // Cleanup renderer, canvas, ARButton, dsb
+      if (renderer && renderer.xr && renderer.xr.getSession()) {
+        renderer.xr.getSession().end();
+      }
+      if (renderer && renderer.dispose) {
+        renderer.dispose();
+      }
+      // Hapus canvas jika perlu
+      const canvas = document.getElementById("canvas");
+      if (canvas) {
+        canvas.width = canvas.height = 0;
+        // Atau: canvas.parentNode && canvas.parentNode.removeChild(canvas);
+      }
+      // Hapus ARButton jika perlu
+      const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+      if (arBtn && arBtn.parentNode) {
+        arBtn.parentNode.removeChild(arBtn);
+      }
+    };
     // eslint-disable-next-line
   }, [id, navigate]);
 
