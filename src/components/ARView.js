@@ -11,6 +11,7 @@ function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [arSupported, setArSupported] = useState(true);
+  const [arActive, setArActive] = useState(true);
 
   // Model dan scale
   const models = [
@@ -62,13 +63,14 @@ function ARView() {
       const canvas = document.getElementById("canvas");
       if (canvas) {
         canvas.width = canvas.height = 0;
+        canvas.style.display = "none";
         // Atau: canvas.parentNode && canvas.parentNode.removeChild(canvas);
       }
       // Hapus ARButton jika perlu
-      const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
-      if (arBtn && arBtn.parentNode) {
-        arBtn.parentNode.removeChild(arBtn);
-      }
+      // const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+      // if (arBtn && arBtn.parentNode) {
+      //   arBtn.parentNode.removeChild(arBtn);
+      // }
     };
     // eslint-disable-next-line
   }, [id, navigate]);
@@ -225,6 +227,7 @@ function ARView() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
+    setArActive(false);
     if (renderer && renderer.xr && renderer.xr.getSession()) {
       await renderer.xr.getSession().end();
     }
@@ -239,7 +242,7 @@ function ARView() {
       >
         ← Back to Gallery
       </button>
-      <canvas id="canvas"></canvas>
+      {arActive && <canvas id="canvas"></canvas>}
       {/* AR Status */}
       {!arSupported && (
         <div className="ar-status">
