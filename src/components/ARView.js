@@ -224,11 +224,18 @@ function ARView() {
   const product = furnitureData.find(f => f.id === Number(id));
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
+  const handleBackToGallery = async () => {
+    if (renderer && renderer.xr && renderer.xr.getSession()) {
+      await renderer.xr.getSession().end();
+    }
+    navigate('/furniture');
+  }
+
   return (
     <div className="ar-view">
       <button
         className="back-to-gallery-btn"
-        onClick={() => navigate('/furniture')}
+        onClick={handleBackToGallery}
       >
         ← Back to Gallery
       </button>
