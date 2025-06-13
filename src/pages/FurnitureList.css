@@ -46,7 +46,7 @@
   min-height: 100vh;
   background-size: 300px;
 
-  background-image: linear-gradient(rgb(0, 0, 0, 0.40), rgb(0, 0, 0, 0.40)), url(../assets/Homepage.jpg);
+  background-image: linear-gradient(rgb(0, 0, 0, 0.30), rgb(0, 0, 0, 0.30)), url(../assets/Homepage.jpg);
   background-size: cover;
 	background-position: center;
 }

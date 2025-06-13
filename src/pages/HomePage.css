@@ -63,7 +63,7 @@ body {
   background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
   text-align: center;
   
-  background-image: linear-gradient(rgb(0, 0, 0, 0.40), rgb(0, 0, 0, 0.40)), url(../assets/Homepage.jpg);
+  background-image: linear-gradient(rgb(0, 0, 0, 0.30), rgb(0, 0, 0, 0.30)), url(../assets/Homepage.jpg);
   background-size: cover;
 	background-position: center;	
 }

@@ -2,45 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import FurnitureCard from '../components/FurnitureCard';
 import './FurnitureList.css';
-
-const furnitureData = [
-  {
-    id: 0,
-    name: "Kabinet",
-    price: 299,
-    image: "/Kabinet.png"
-  },
-  {
-    id: 1,
-    name: "Kasur",
-    price: 399,
-    image: "/Kasur.png"
-  },
-  {
-    id: 2,
-    name: "Lemari",
-    price: 249,
-    image: "/Lemari.png"
-  },
-  {
-    id: 3,
-    name: "Meja",
-    price: 249,
-    image: "/Meja.png"
-  },
-  {
-    id: 4,
-    name: "Lamp",
-    price: 249,
-    image: "/Lamp.png"
-  },
-  {
-    id: 5,
-    name: "Sofa",
-    price: 249,
-    image: "/Sofa.png"
-  },
-];
+import furnitureData from '../data/furnitureData';
 
 function FurnitureList() {
   const navigate = useNavigate();

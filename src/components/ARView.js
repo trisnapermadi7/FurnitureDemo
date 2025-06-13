@@ -5,32 +5,13 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { XREstimatedLight } from 'three/examples/jsm/webxr/XREstimatedLight';
 import { useParams, useNavigate } from 'react-router-dom';
 import './ARView.css';
+import furnitureData from '../data/furnitureData';
 
 function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [navbarOpen, setNavbarOpen] = useState(false)
   const [arSupported, setArSupported] = useState(true);
 
-  let reticle;
-  let hitTestSource = null;
-  let hitTestSourceRequested = false;
-
-  let scene, camera, renderer;
-
-  let models = [
-    "/Kabinet_AjengDiahPramesti.glb",
-    "/Kasur_HariOctavianDelrossi.glb", 
-    "/Lemari_FarlyhaydyH.Djalil.glb",
-    "/Meja_TrisnaCahyaPermadi.glb",
-    "/Qohary_Lamp.glb",
-    "/Armchair_PiolaEvania.glb",
-  ];
-  let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
-  let items = [];
-  let itemSelectedIndex = 0;
-
-  // Cek support AR hanya sekali saat mount
   useEffect(() => {
     if (navigator.xr && navigator.xr.isSessionSupported) {
       navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
@@ -105,10 +86,12 @@ function ARView() {
     document.body.appendChild(arButton);
 
     for (let i = 0; i < models.length; i++) {
+      const idx = i;
       const loader = new GLTFLoader();
-      loader.load(models[i], function (glb) {
+      // eslint-disable-next-line no-loop-func
+      loader.load(models[idx], function (glb) {
         let model = glb.scene;
-        items[i] = model;
+        items[idx] = model;
       });
     }
 
@@ -124,6 +107,29 @@ function ARView() {
     reticle.visible = false;
     scene.add(reticle);
   }
+
+  const product = furnitureData.find(f => f.id === Number(id));
+  if (!product) return <div>Produk tidak ditemukan.</div>;
+
+  let reticle;
+  let hitTestSource = null;
+  let hitTestSourceRequested = false;
+
+  let scene, camera, renderer;
+
+  let models = [
+    "/Kabinet_AjengDiahPramesti.glb",
+    "/Kasur_HariOctavianDelrossi.glb", 
+    "/Lemari_FarlyhaydyH.Djalil.glb",
+    "/Meja_TrisnaCahyaPermadi.glb",
+    "/Qohary_Lamp.glb",
+    "/Armchair_PiolaEvania.glb",
+  ];
+  let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
+  let items = [];
+  let itemSelectedIndex = 0;
+
+  // Cek support AR hanya sekali saat mount
 
   function onSelect() {
     if (reticle.visible) {
@@ -217,43 +223,16 @@ function ARView() {
       <canvas id="canvas"></canvas>
       {/* AR Status */}
       {!arSupported && (
-        <div className={`ar-status${navbarOpen ? '' : ' closed'}`}>
+        <div className="ar-status">
           AR NOT SUPPORTED
         </div>
       )}
-      <div className={`navbar${navbarOpen ? '' : ' closed'}`}>
-        <button
-          className="navbar-toggle"
-          onClick={() => setNavbarOpen((open) => !open)}
-          aria-label={navbarOpen ? "Tutup Navbar" : "Buka Navbar"}
-        >
-          <span className="arrow">{navbarOpen ? "▼" : "▲"}</span>
-        </button>
-        <div className="button-list">
-          <div className="button-container">
-            <img className="button-image" id="item0" src="/Kabinet.png" alt="Kabinet" />
-            <div className="item-label">Kabinet</div>
-          </div>
-          <div className="button-container">
-            <img className="button-image" id="item1" src="/Kasur.png" alt="Kasur" />
-            <div className="item-label">Kasur</div>
-          </div>
-          <div className="button-container">
-            <img className="button-image" id="item2" src="/Lemari.png" alt="Lemari" />
-            <div className="item-label">Lemari</div>
-          </div>
-          <div className="button-container">
-            <img className="button-image" id="item3" src="/Meja.png" alt="Meja" />
-            <div className="item-label">Meja</div>
-          </div>
-          <div className="button-container">
-            <img className="button-image" id="item4" src="/Lamp.png" alt="Lamp" />
-            <div className="item-label">Lamp</div>
-          </div>
-          <div className="button-container">
-            <img className="button-image" id="item5" src="/Sofa.png" alt="Sofa" />
-            <div className="item-label">Armchairr</div>
-          </div>
+      <div className="arview-product-info">
+        <img src={product.image} alt={product.name} className="arview-product-image" />
+        <div className="arview-product-meta">
+          <h3 className="arview-product-title">{product.name}</h3>
+          <div className="arview-product-size">Size: {product.size}</div>
+          <div className="arview-product-desc">{product.description}</div>
         </div>
       </div>
     </div>

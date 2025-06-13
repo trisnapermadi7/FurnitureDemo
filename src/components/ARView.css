@@ -127,7 +127,7 @@ code {
   font-weight: bold;
   padding: 8px 18px;
   border-radius: 6px;
-  bottom: 23vh; /* posisi saat navbar open */
+  bottom: 32vh; /* posisi saat navbar open */
   z-index: 200;
   transition: bottom 0.3s;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -157,7 +157,7 @@ code {
   height: 120px;
   object-fit: contain;
   border-radius: 16px;
-  background: #fff;
+  background: rgba(60,60,60,0.92);
   margin-bottom: 18px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.10);
 }
