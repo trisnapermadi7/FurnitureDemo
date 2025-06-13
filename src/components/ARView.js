@@ -9,9 +9,29 @@ import furnitureData from '../data/furnitureData';
 
 function ARView() {
   const { id } = useParams();
-  const itemSelectedIndex = Number(id);
   const navigate = useNavigate();
   const [arSupported, setArSupported] = useState(true);
+
+  // Model dan scale
+  const models = [
+    "/Kabinet_AjengDiahPramesti.glb",
+    "/Kasur_HariOctavianDelrossi.glb", 
+    "/Lemari_FarlyhaydyH.Djalil.glb",
+    "/Meja_TrisnaCahyaPermadi.glb",
+    "/Qohary_Lamp.glb",
+    "/Armchair_PiolaEvania.glb",
+  ];
+  const modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
+  let items = [];
+
+  // Cari index model berdasarkan id furniture
+  const initialIndex = furnitureData.findIndex(f => f.id === Number(id));
+  const [itemSelectedIndex, setItemSelectedIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
+
+  let reticle;
+  let hitTestSource = null;
+  let hitTestSourceRequested = false;
+  let scene, camera, renderer;
 
   useEffect(() => {
     if (navigator.xr && navigator.xr.isSessionSupported) {
@@ -23,23 +43,14 @@ function ARView() {
     }
   }, []);
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    // Update index jika id berubah
+    if (initialIndex !== -1) setItemSelectedIndex(initialIndex);
     init();
     setupFurnitureSelection();
     animate();
-
-    // const backButton = document.createElement('button');
-    // backButton.textContent = 'Back to Gallery';
-    // backButton.className = 'back-button';
-    // backButton.onclick = () => navigate('/furniture');
-    // document.body.appendChild(backButton);
-
-    // return () => {
-    //   document.body.removeChild(backButton);
-    // };
+    // eslint-disable-next-line
   }, [id, navigate]);
-  /* eslint-enable react-hooks/exhaustive-deps */
 
   function init() {
     let myCanvas = document.getElementById("canvas");
@@ -89,7 +100,6 @@ function ARView() {
     for (let i = 0; i < models.length; i++) {
       const idx = i;
       const loader = new GLTFLoader();
-      // eslint-disable-next-line no-loop-func
       loader.load(models[idx], function (glb) {
         let model = glb.scene;
         items[idx] = model;
@@ -109,30 +119,8 @@ function ARView() {
     scene.add(reticle);
   }
 
-  const product = furnitureData.find(f => f.id === Number(id));
-  if (!product) return <div>Produk tidak ditemukan.</div>;
-
-  let reticle;
-  let hitTestSource = null;
-  let hitTestSourceRequested = false;
-
-  let scene, camera, renderer;
-
-  let models = [
-    "/Kabinet_AjengDiahPramesti.glb",
-    "/Kasur_HariOctavianDelrossi.glb", 
-    "/Lemari_FarlyhaydyH.Djalil.glb",
-    "/Meja_TrisnaCahyaPermadi.glb",
-    "/Qohary_Lamp.glb",
-    "/Armchair_PiolaEvania.glb",
-  ];
-  let modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
-  let items = [];
-
-  // Cek support AR hanya sekali saat mount
-
   function onSelect() {
-    if (reticle.visible) {
+    if (reticle.visible && items[itemSelectedIndex]) {
       let newModel = items[itemSelectedIndex].clone();
       newModel.visible = true;
       reticle.matrix.decompose(
@@ -164,6 +152,7 @@ function ARView() {
   }
 
   const onClicked = (e, selectItem, index) => {
+    setItemSelectedIndex(index);
     for (let i = 0; i < models.length; i++) {
       const el = document.querySelector(`#item` + i);
       if (el) el.classList.remove("clicked");
@@ -210,6 +199,9 @@ function ARView() {
     }
     renderer.render(scene, camera);
   }
+
+  const product = furnitureData.find(f => f.id === Number(id));
+  if (!product) return <div>Produk tidak ditemukan.</div>;
 
   return (
     <div className="ar-view">
