@@ -61,6 +61,7 @@ function cleanupAR() {
   if (arBtnById && arBtnById.parentNode) {
     arBtnById.parentNode.removeChild(arBtnById);
   }
+  document.body.style.display = 'block';
 }
 
   useEffect(() => {
@@ -131,11 +132,11 @@ function cleanupAR() {
     arButton.style.bottom = "22%";
     document.body.appendChild(arButton);
 
-    renderer.xr.addEventListener('sessionstart', () => {
-      const session = renderer.xr.getSession();
-      if (session) {
-        session.addEventListener('end', () => {
-          // Cleanup AR dan kembali ke galeri
+        renderer.xr.addEventListener('sessionstart', () => {
+        const session = renderer.xr.getSession();
+        if (session) {
+          session.addEventListener('end', () => {
+          document.body.style.display = 'block'; // Pastikan body tampil lagi
           setArActive(false);
           setTimeout(() => {
             navigate('/furniture');
