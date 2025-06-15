@@ -49,18 +49,33 @@ function ARView() {
   }, []);
 
 function cleanupAR() {
-    return new Promise((resolve) => {
-      if (rendererRef.current && rendererRef.current.xr && rendererRef.current.xr.getSession()) {
-        rendererRef.current.xr.getSession().end().then(() => {
-          if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
-          resolve();
-        });
-      } else {
+  return new Promise((resolve) => {
+    // 1. Akhiri sesi AR jika masih berjalan
+    if (rendererRef.current && rendererRef.current.xr && rendererRef.current.xr.getSession()) {
+      rendererRef.current.xr.getSession().end().then(() => {
+        // 2. Dispose renderer
         if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
+        // 3. Hapus canvas dari DOM
+        const canvas = document.getElementById("canvas");
+        if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+        // 4. Hapus ARButton dari DOM
+        const arBtn = document.querySelector('.ar-button, .webxr-ar-button, #ARButton');
+        if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
         resolve();
-      }
-    });
-  }
+      });
+    } else {
+      // 2. Dispose renderer
+      if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
+      // 3. Hapus canvas dari DOM
+      const canvas = document.getElementById("canvas");
+      if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+      // 4. Hapus ARButton dari DOM
+      const arBtn = document.querySelector('.ar-button, .webxr-ar-button, #ARButton');
+      if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
+      resolve();
+    }
+  });
+}
 
   useEffect(() => {
     // Update index jika id berubah
