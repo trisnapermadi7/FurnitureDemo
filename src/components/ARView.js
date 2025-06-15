@@ -44,36 +44,46 @@ function ARView() {
     }
   }, []);
 
+function cleanupAR() {
+  if (renderer && renderer.xr && renderer.xr.getSession()) {
+    renderer.xr.getSession().end();
+  }
+  if (renderer && renderer.dispose) {
+    renderer.dispose();
+  }
+  // Hapus ARButton dari three.js (class)
+  const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+  if (arBtn && arBtn.parentNode) {
+    arBtn.parentNode.removeChild(arBtn);
+  }
+  // Hapus ARButton jika masih ada di DOM (id)
+  const arBtnById = document.getElementById('ARButton');
+  if (arBtnById && arBtnById.parentNode) {
+    arBtnById.parentNode.removeChild(arBtnById);
+  }
+}
+
   useEffect(() => {
     // Update index jika id berubah
     if (initialIndex !== -1) setItemSelectedIndex(initialIndex);
-    init();
-    setupFurnitureSelection();
-    animate();
 
+  // Tunggu sampai canvas sudah ada di DOM
+  if (arActive) {
+    const waitForCanvas = setInterval(() => {
+      const myCanvas = document.getElementById("canvas");
+      if (myCanvas) {
+        clearInterval(waitForCanvas);
+        init();
+        setupFurnitureSelection();
+        animate();
+      }
+    }, 50);
+  }
     return () => {
-      // Cleanup renderer, canvas, ARButton, dsb
-      if (renderer && renderer.xr && renderer.xr.getSession()) {
-        renderer.xr.getSession().end();
-      }
-      if (renderer && renderer.dispose) {
-        renderer.dispose();
-      }
-      // Hapus canvas jika perlu
-      const canvas = document.getElementById("canvas");
-      if (canvas) {
-        canvas.width = canvas.height = 0;
-        canvas.style.display = "none";
-        // Atau: canvas.parentNode && canvas.parentNode.removeChild(canvas);
-      }
-      // Hapus ARButton jika perlu
-      // const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
-      // if (arBtn && arBtn.parentNode) {
-      //   arBtn.parentNode.removeChild(arBtn);
-      // }
-    };
-    // eslint-disable-next-line
-  }, [id, navigate]);
+    cleanupAR();
+  };
+  // eslint-disable-next-line
+}, [id, navigate, arActive]);
 
   function init() {
     let myCanvas = document.getElementById("canvas");
@@ -112,6 +122,7 @@ function ARView() {
       scene.remove(xrLight);
     });
 
+    if (arSupported) {
     let arButton = ARButton.createButton(renderer, {
       requiredFeatures: ["hit-test"],
       optionalFeatures: ["dom-overlay", "light-estimation"],
@@ -119,6 +130,7 @@ function ARView() {
     });
     arButton.style.bottom = "22%";
     document.body.appendChild(arButton);
+  }
 
     for (let i = 0; i < models.length; i++) {
       const idx = i;
@@ -227,38 +239,31 @@ function ARView() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
-    setArActive(false);
-    if (renderer && renderer.xr && renderer.xr.getSession()) {
-      await renderer.xr.getSession().end();
-    }
-    navigate('/furniture');
-  }
+  setArActive(false);
+  setArSupported(true);
+  cleanupAR();
+  navigate('/furniture');
+}
 
   return (
-    <div className="ar-view">
-      <button
-        className="back-to-gallery-btn"
-        onClick={handleBackToGallery}
-      >
-        ← Back to Gallery
-      </button>
-      {arActive && <canvas id="canvas"></canvas>}
-      {/* AR Status */}
-      {!arSupported && (
-        <div className="ar-status">
-          AR NOT SUPPORTED
-        </div>
-      )}
-      <div className="arview-product-info">
-        <img src={product.image} alt={product.name} className="arview-product-image" />
-        <div className="arview-product-meta">
-          <h3 className="arview-product-title">{product.name}</h3>
-          <div className="arview-product-size">Size: {product.size}</div>
-          <div className="arview-product-desc">{product.description}</div>
-        </div>
+  <div className="ar-view">
+    <button
+      className="back-to-gallery-btn"
+      onClick={handleBackToGallery}
+    >
+      ← Back to Gallery
+    </button>
+    {arActive && <canvas id="canvas"></canvas>}
+    <div className="arview-product-info">
+      <img src={product.image} alt={product.name} className="arview-product-image" />
+      <div className="arview-product-meta">
+        <h3 className="arview-product-title">{product.name}</h3>
+        <div className="arview-product-size">Size: {product.size}</div>
+        <div className="arview-product-desc">{product.description}</div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default ARView;
