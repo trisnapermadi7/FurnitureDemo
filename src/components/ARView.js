@@ -283,7 +283,8 @@ function cleanupAR() {
     setArActive(false);    // Baru hilangkan canvas
     setIsCleaningUp(false);
     setArSupported(true);
-    window.location.reload(); // Reload halaman untuk kembali ke galeri
+    console.log('navigating...')
+    window.location.href = '/furniture';
   };
 
   return (
