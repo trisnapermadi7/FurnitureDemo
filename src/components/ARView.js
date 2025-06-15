@@ -45,22 +45,28 @@ function ARView() {
   }, []);
 
 function cleanupAR() {
-  if (renderer && renderer.xr && renderer.xr.getSession()) {
-    renderer.xr.getSession().end();
-  }
-  if (renderer && renderer.dispose) {
-    renderer.dispose();
-  }
-  // Hapus ARButton dari three.js (class)
-  const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
-  if (arBtn && arBtn.parentNode) {
-    arBtn.parentNode.removeChild(arBtn);
-  }
-  // Hapus ARButton jika masih ada di DOM (id)
-  const arBtnById = document.getElementById('ARButton');
-  if (arBtnById && arBtnById.parentNode) {
-    arBtnById.parentNode.removeChild(arBtnById);
-  }
+  return new Promise((resolve) => {
+    if (renderer && renderer.xr && renderer.xr.getSession()) {
+      renderer.xr.getSession().end().then(() => {
+        if (renderer && renderer.dispose) renderer.dispose();
+        // Hapus ARButton
+        const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+        if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
+        // Hapus ARButton jika masih ada di DOM (id)
+        const arBtnById = document.getElementById('ARButton');
+        if (arBtnById && arBtnById.parentNode) arBtnById.parentNode.removeChild(arBtnById);
+        resolve();
+      });
+    } else {
+      if (renderer && renderer.dispose) renderer.dispose();
+      // Hapus ARButton
+      const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+      if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
+      const arBtnById = document.getElementById('ARButton');
+      if (arBtnById && arBtnById.parentNode) arBtnById.parentNode.removeChild(arBtnById);
+      resolve();
+    }
+  });
 }
 
   useEffect(() => {
@@ -251,14 +257,14 @@ function cleanupAR() {
   const product = furnitureData.find(f => f.id === Number(id));
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
-  const handleBackToGallery = () => {
-  setArActive(false); // Ini akan membuat canvas hilang
-  setTimeout(() => {
-    cleanupAR();      // Pastikan cleanup setelah canvas hilang
+  const handleBackToGallery = async () => {
+    // 1. Cleanup AR dulu
+    await cleanupAR();
+    // 2. Baru hilangkan canvas dan navigate
+    setArActive(false);
     setArSupported(true);
     navigate('/furniture');
-  }, 100); // Delay kecil agar React sempat re-render
-};
+  };
 
   return (
   <div className="ar-view">
