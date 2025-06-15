@@ -240,8 +240,7 @@ function cleanupAR() {
 
   const handleBackToGallery = () => {
   cleanupAR();         // 1. Cleanup dulu
-  setTimeout(() => {
-    setArActive(false); // 2. Baru hilangkan canvas
+  setTimeout(() => { // 2. Baru hilangkan canvas
     setArSupported(true);
     navigate('/furniture');
   }, 100); // Delay kecil agar cleanup selesai
