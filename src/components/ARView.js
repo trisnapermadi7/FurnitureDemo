@@ -239,12 +239,12 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = () => {
-  setArActive(false); // Ini akan membuat canvas hilang
+  cleanupAR();         // 1. Cleanup dulu
   setTimeout(() => {
-    cleanupAR();      // Pastikan cleanup setelah canvas hilang
+    setArActive(false); // 2. Baru hilangkan canvas
     setArSupported(true);
     navigate('/furniture');
-  }, 100); // Delay kecil agar React sempat re-render
+  }, 100); // Delay kecil agar cleanup selesai
 };
 
   return (
