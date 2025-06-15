@@ -283,8 +283,7 @@ function cleanupAR() {
     setArActive(false);    // Baru hilangkan canvas
     setIsCleaningUp(false);
     setArSupported(true);
-    navigate('/furniture');
-    window.location.reload();
+    window.location.href = '/furniture';
   };
 
   return (
