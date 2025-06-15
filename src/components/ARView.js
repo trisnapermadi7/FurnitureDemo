@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -23,22 +23,16 @@ function ARView() {
     "/Armchair_PiolaEvania.glb",
   ];
   const modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
-
-  // Gunakan useRef untuk instance Three.js dan array items
-  const itemsRef = useRef([]);
-  const sceneRef = useRef();
-  const cameraRef = useRef();
-  const rendererRef = useRef();
-  const reticleRef = useRef();
-  const hitTestSourceRef = useRef(null);
-  const hitTestSourceRequestedRef = useRef(false);
-  // const animationIdRef = useRef();
-  const controllerRef = useRef();
-  const arButtonRef = useRef();
+  let items = [];
 
   // Cari index model berdasarkan id furniture
   const initialIndex = furnitureData.findIndex(f => f.id === Number(id));
   const [itemSelectedIndex, setItemSelectedIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
+
+  let reticle;
+  let hitTestSource = null;
+  let hitTestSourceRequested = false;
+  let scene, camera, renderer;
 
   useEffect(() => {
     if (navigator.xr && navigator.xr.isSessionSupported) {
@@ -50,46 +44,51 @@ function ARView() {
     }
   }, []);
 
-  // Cleanup AR session dan resource
-  function cleanupAR() {
-    // End XR session jika masih aktif
-    if (rendererRef.current && rendererRef.current.xr && rendererRef.current.xr.getSession()) {
-      rendererRef.current.xr.getSession().end();
-    }
-    // Dispose renderer
-    if (rendererRef.current && rendererRef.current.dispose) {
-      rendererRef.current.dispose();
-    }
-    // Hapus ARButton jika ada
-    if (arButtonRef.current && arButtonRef.current.parentNode) {
-      arButtonRef.current.parentNode.removeChild(arButtonRef.current);
-      arButtonRef.current = null;
-    }
-    // Cancel animation loop
-    if (rendererRef.current) {
-      rendererRef.current.setAnimationLoop(null);
-    }
-    // Reset hit test
-    hitTestSourceRef.current = null;
-    hitTestSourceRequestedRef.current = false;
-    // Hapus event listener controller
-    if (controllerRef.current) {
-      controllerRef.current.removeEventListener("select", onSelect);
-      controllerRef.current = null;
-    }
-    // Kosongkan items
-    itemsRef.current = [];
-    // Hapus scene, camera, reticle
-    sceneRef.current = null;
-    cameraRef.current = null;
-    reticleRef.current = null;
+function cleanupAR() {
+  if (renderer && renderer.xr && renderer.xr.getSession()) {
+    renderer.xr.getSession().end();
   }
+  if (renderer && renderer.dispose) {
+    renderer.dispose();
+  }
+  // Hapus ARButton dari three.js (class)
+  const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+  if (arBtn && arBtn.parentNode) {
+    arBtn.parentNode.removeChild(arBtn);
+  }
+  // Hapus ARButton jika masih ada di DOM (id)
+  const arBtnById = document.getElementById('ARButton');
+  if (arBtnById && arBtnById.parentNode) {
+    arBtnById.parentNode.removeChild(arBtnById);
+  }
+}
 
-  // Inisialisasi AR
+  useEffect(() => {
+    // Update index jika id berubah
+    if (initialIndex !== -1) setItemSelectedIndex(initialIndex);
+
+  // Tunggu sampai canvas sudah ada di DOM
+  if (arActive) {
+    const waitForCanvas = setInterval(() => {
+      const myCanvas = document.getElementById("canvas");
+      if (myCanvas) {
+        clearInterval(waitForCanvas);
+        init();
+        setupFurnitureSelection();
+        animate();
+      }
+    }, 50);
+  }
+    return () => {
+    cleanupAR();
+  };
+  // eslint-disable-next-line
+}, [id, navigate, arActive]);
+
   function init() {
     let myCanvas = document.getElementById("canvas");
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(
       70,
       window.innerWidth / window.innerHeight,
       0.01,
@@ -100,7 +99,7 @@ function ARView() {
     light.position.set(0.5, 1, 0.25);
     scene.add(light);
 
-    const renderer = new THREE.WebGLRenderer({
+    renderer = new THREE.WebGLRenderer({
       canvas: myCanvas,
       antialias: true,
       alpha: true,
@@ -109,12 +108,6 @@ function ARView() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
 
-    // Simpan ke ref
-    sceneRef.current = scene;
-    cameraRef.current = camera;
-    rendererRef.current = renderer;
-
-    // Light estimation
     const xrLight = new XREstimatedLight(renderer);
     xrLight.addEventListener("estimationstart", () => {
       scene.add(xrLight);
@@ -123,56 +116,46 @@ function ARView() {
         scene.environment = xrLight.environment;
       }
     });
+
     xrLight.addEventListener("estimationend", () => {
       scene.add(light);
       scene.remove(xrLight);
     });
 
-    // ARButton hanya dibuat sekali
-    if (arSupported && !arButtonRef.current) {
-      const arButton = ARButton.createButton(renderer, {
-        requiredFeatures: ["hit-test"],
-        optionalFeatures: ["dom-overlay", "light-estimation"],
-        domOverlay: { root: document.body },
-      });
-      arButton.style.bottom = "22%";
-      document.body.appendChild(arButton);
-      arButtonRef.current = arButton;
-    }
+    if (arSupported) {
+    let arButton = ARButton.createButton(renderer, {
+      requiredFeatures: ["hit-test"],
+      optionalFeatures: ["dom-overlay", "light-estimation"],
+      domOverlay: { root: document.body },
+    });
+    arButton.style.bottom = "22%";
+    document.body.appendChild(arButton);
+  }
 
-    // Load semua model ke itemsRef
     for (let i = 0; i < models.length; i++) {
       const idx = i;
       const loader = new GLTFLoader();
       loader.load(models[idx], function (glb) {
         let model = glb.scene;
-        itemsRef.current[idx] = model;
+        items[idx] = model;
       });
     }
 
-    // Controller
     const controller = renderer.xr.getController(0);
     controller.addEventListener("select", onSelect);
     scene.add(controller);
-    controllerRef.current = controller;
 
-    // Reticle
-    const reticle = new THREE.Mesh(
+    reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial()
     );
     reticle.matrixAutoUpdate = false;
     reticle.visible = false;
     scene.add(reticle);
-    reticleRef.current = reticle;
   }
 
-  // Fungsi select untuk menaruh model
   function onSelect() {
-    const reticle = reticleRef.current;
-    const scene = sceneRef.current;
-    const items = itemsRef.current;
-    if (reticle && reticle.visible && items[itemSelectedIndex]) {
+    if (reticle.visible && items[itemSelectedIndex]) {
       let newModel = items[itemSelectedIndex].clone();
       newModel.visible = true;
       reticle.matrix.decompose(
@@ -186,7 +169,6 @@ function ARView() {
     }
   }
 
-  // Setup event untuk pilih furniture
   function setupFurnitureSelection() {
     for (let i = 0; i < models.length; i++) {
       const el = document.querySelector(`#item` + i);
@@ -198,7 +180,7 @@ function ARView() {
         el.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          onClicked(e, itemsRef.current[i], i);
+          onClicked(e, items[i], i);
         });
       }
     }
@@ -213,43 +195,34 @@ function ARView() {
     e.target.classList.add("clicked");
   };
 
-  // Animation loop
   function animate() {
-    if (rendererRef.current) {
-      rendererRef.current.setAnimationLoop(render);
-    }
+    renderer.setAnimationLoop(render);
   }
 
-  // Render loop
   function render(timestamp, frame) {
-    const renderer = rendererRef.current;
-    const scene = sceneRef.current;
-    const camera = cameraRef.current;
-    const reticle = reticleRef.current;
-
-    if (frame && renderer && scene && camera && reticle) {
+    if (frame) {
       const referenceSpace = renderer.xr.getReferenceSpace();
       const session = renderer.xr.getSession();
 
-      if (!hitTestSourceRequestedRef.current) {
+      if (hitTestSourceRequested === false) {
         session.requestReferenceSpace("viewer").then(function (referenceSpace) {
           session
             .requestHitTestSource({ space: referenceSpace })
             .then(function (source) {
-              hitTestSourceRef.current = source;
+              hitTestSource = source;
             });
         });
 
         session.addEventListener("end", function () {
-          hitTestSourceRequestedRef.current = false;
-          hitTestSourceRef.current = null;
+          hitTestSourceRequested = false;
+          hitTestSource = null;
         });
 
-        hitTestSourceRequestedRef.current = true;
+        hitTestSourceRequested = true;
       }
 
-      if (hitTestSourceRef.current) {
-        const hitTestResults = frame.getHitTestResults(hitTestSourceRef.current);
+      if (hitTestSource) {
+        const hitTestResults = frame.getHitTestResults(hitTestSource);
         if (hitTestResults.length) {
           const hit = hitTestResults[0];
           reticle.visible = true;
@@ -259,63 +232,40 @@ function ARView() {
         }
       }
     }
-    if (renderer && scene && camera) {
-      renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
   }
-
-  // Efek utama: inisialisasi dan cleanup AR
-  useEffect(() => {
-    // Update index jika id berubah
-    if (initialIndex !== -1) setItemSelectedIndex(initialIndex);
-
-    if (arActive) {
-      const waitForCanvas = setInterval(() => {
-        const myCanvas = document.getElementById("canvas");
-        if (myCanvas) {
-          clearInterval(waitForCanvas);
-          init();
-          setupFurnitureSelection();
-          animate();
-        }
-      }, 50);
-    }
-    return () => {
-      cleanupAR();
-    };
-    // eslint-disable-next-line
-  }, [id, navigate, arActive]);
 
   const product = furnitureData.find(f => f.id === Number(id));
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
-  // Tombol kembali ke galeri (stop AR)
   const handleBackToGallery = () => {
-    setArActive(false); // Akan trigger cleanupAR lewat useEffect
-    setTimeout(() => {
-      navigate('/furniture');
-    }, 100);
-  };
+  setArActive(false); // Ini akan membuat canvas hilang
+  setTimeout(() => {
+    cleanupAR();      // Pastikan cleanup setelah canvas hilang
+    setArSupported(true);
+    navigate('/furniture');
+  }, 100); // Delay kecil agar React sempat re-render
+};
 
   return (
-    <div className="ar-view">
-      <button
-        className="back-to-gallery-btn"
-        onClick={handleBackToGallery}
-      >
-        ← Back to Gallery
-      </button>
-      {arActive && <canvas id="canvas"></canvas>}
-      <div className="arview-product-info">
-        <img src={product.image} alt={product.name} className="arview-product-image" />
-        <div className="arview-product-meta">
-          <h3 className="arview-product-title">{product.name}</h3>
-          <div className="arview-product-size">Size: {product.size}</div>
-          <div className="arview-product-desc">{product.description}</div>
-        </div>
+  <div className="ar-view">
+    <button
+      className="back-to-gallery-btn"
+      onClick={handleBackToGallery}
+    >
+      ← Back to Gallery
+    </button>
+    {arActive && <canvas id="canvas"></canvas>}
+    <div className="arview-product-info">
+      <img src={product.image} alt={product.name} className="arview-product-image" />
+      <div className="arview-product-meta">
+        <h3 className="arview-product-title">{product.name}</h3>
+        <div className="arview-product-size">Size: {product.size}</div>
+        <div className="arview-product-desc">{product.description}</div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default ARView;
