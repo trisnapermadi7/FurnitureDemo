@@ -12,6 +12,7 @@ function ARView() {
   const navigate = useNavigate();
   const [arSupported, setArSupported] = useState(true);
   const [arActive, setArActive] = useState(true);
+  const [navbarOpen, setNavbarOpen] = useState(true);
 
   // Model dan scale
   const models = [
@@ -270,7 +271,13 @@ function cleanupAR() {
       ← Back to Gallery
     </button>
     {arActive && <canvas id="canvas"></canvas>}
-    <div className="arview-product-info">
+    <div className={`arview-product-info${navbarOpen ? '' : ' closed'}`}>
+      <div
+        className="arview-navbar-toggle"
+        onClick={() => setNavbarOpen(!navbarOpen)}
+      >
+        <span className={`arrow ${navbarOpen ? 'down' : 'up'}`}></span>
+      </div>
       <img src={product.image} alt={product.name} className="arview-product-image" />
       <div className="arview-product-meta">
         <h3 className="arview-product-title">{product.name}</h3>
