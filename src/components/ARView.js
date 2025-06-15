@@ -238,12 +238,14 @@ function cleanupAR() {
   const product = furnitureData.find(f => f.id === Number(id));
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
-  const handleBackToGallery = async () => {
-  cleanupAR();
-  setArActive(false);
-  setArSupported(true);
-  navigate('/furniture');
-}
+  const handleBackToGallery = () => {
+  setArActive(false); // Ini akan membuat canvas hilang
+  setTimeout(() => {
+    cleanupAR();      // Pastikan cleanup setelah canvas hilang
+    setArSupported(true);
+    navigate('/furniture');
+  }, 100); // Delay kecil agar React sempat re-render
+};
 
   return (
   <div className="ar-view">
