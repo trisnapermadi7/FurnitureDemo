@@ -12,6 +12,7 @@ function ARView() {
   const navigate = useNavigate();
   const [arSupported, setArSupported] = useState(true);
   const [arActive, setArActive] = useState(true);
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
 
   // Model dan scale
   const models = [
@@ -258,10 +259,10 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
-    // 1. Cleanup AR dulu
+    setIsCleaningUp(true); // Tampilkan canvas selama cleanup
     await cleanupAR();
-    // 2. Baru hilangkan canvas dan navigate
-    setArActive(false);
+    setArActive(false);    // Baru hilangkan canvas
+    setIsCleaningUp(false);
     setArSupported(true);
     navigate('/furniture');
   };
@@ -274,7 +275,7 @@ function cleanupAR() {
     >
       ← Back to Gallery
     </button>
-    {arActive && <canvas id="canvas"></canvas>}
+    {(arActive || isCleaningUp) && <canvas id="canvas"></canvas>}
     <div className="arview-product-info">
       <img src={product.image} alt={product.name} className="arview-product-image" />
       <div className="arview-product-meta">
