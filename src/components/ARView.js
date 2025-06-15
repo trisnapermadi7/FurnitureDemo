@@ -284,6 +284,7 @@ function cleanupAR() {
     setIsCleaningUp(false);
     setArSupported(true);
     navigate('/furniture');
+    window.location.href = '/furniture';
   };
 
   return (
@@ -292,7 +293,7 @@ function cleanupAR() {
       className="back-to-gallery-btn"
       onClick={handleBackToGallery}
     >
-      ← Back to Gallery
+      ← Back to Galler
     </button>
     {(arActive || isCleaningUp) && <canvas id="canvas"></canvas>}
     <div className="arview-product-info">
