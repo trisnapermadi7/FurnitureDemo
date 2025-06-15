@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -10,12 +10,8 @@ import furnitureData from '../data/furnitureData';
 function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const sceneRef = useRef();
-  const cameraRef = useRef();
-  const rendererRef = useRef();
   const [arSupported, setArSupported] = useState(true);
   const [arActive, setArActive] = useState(true);
-  const [isCleaningUp, setIsCleaningUp] = useState(false);
 
   // Model dan scale
   const models = [
@@ -49,32 +45,22 @@ function ARView() {
   }, []);
 
 function cleanupAR() {
-  return new Promise((resolve) => {
-    // 1. Akhiri sesi AR jika masih berjalan
-    if (rendererRef.current && rendererRef.current.xr && rendererRef.current.xr.getSession()) {
-      rendererRef.current.xr.getSession().end().then(() => {
-        // 2. Dispose renderer
-        if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
-        // 3. Hapus canvas dari DOM
-        const canvas = document.getElementById("canvas");
-        if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
-        // 4. Hapus ARButton dari DOM
-        const arBtn = document.querySelector('.ar-button, .webxr-ar-button, #ARButton');
-        if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
-        resolve();
-      });
-    } else {
-      // 2. Dispose renderer
-      if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
-      // 3. Hapus canvas dari DOM
-      const canvas = document.getElementById("canvas");
-      if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
-      // 4. Hapus ARButton dari DOM
-      const arBtn = document.querySelector('.ar-button, .webxr-ar-button, #ARButton');
-      if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
-      resolve();
-    }
-  });
+  if (renderer && renderer.xr && renderer.xr.getSession()) {
+    renderer.xr.getSession().end();
+  }
+  if (renderer && renderer.dispose) {
+    renderer.dispose();
+  }
+  // Hapus ARButton dari three.js (class)
+  const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
+  if (arBtn && arBtn.parentNode) {
+    arBtn.parentNode.removeChild(arBtn);
+  }
+  // Hapus ARButton jika masih ada di DOM (id)
+  const arBtnById = document.getElementById('ARButton');
+  if (arBtnById && arBtnById.parentNode) {
+    arBtnById.parentNode.removeChild(arBtnById);
+  }
 }
 
   useEffect(() => {
@@ -108,18 +94,6 @@ function cleanupAR() {
       0.01,
       20
     );
-
-    sceneRef.current = new THREE.Scene();
-    cameraRef.current = new THREE.PerspectiveCamera(
-      70,
-      window.innerWidth / window.innerHeight,
-      0.01,
-      20
-    );
-    rendererRef.current = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
 
     const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     light.position.set(0.5, 1, 0.25);
@@ -278,15 +252,13 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
-    alert('Tombol diklik!');
-    setIsCleaningUp(true); // Tampilkan canvas selama cleanup
-    await cleanupAR();
-    setArActive(false);    // Baru hilangkan canvas
-    setIsCleaningUp(false);
-    setArSupported(true);
-    console.log('navigating...')
-    window.location.href = '/furniture';
-  };
+  // 1. Cleanup AR dulu
+  await cleanupAR();
+  // 2. Baru hilangkan canvas dan navigate
+  setArActive(false);
+  setArSupported(true);
+  navigate('/furniture');
+};
 
   return (
   <div className="ar-view">
@@ -296,7 +268,7 @@ function cleanupAR() {
     >
       ← Back to Gallery
     </button>
-    {(arActive || isCleaningUp) && <canvas id="canvas"></canvas>}
+    {arActive && <canvas id="canvas"></canvas>}
     <div className="arview-product-info">
       <img src={product.image} alt={product.name} className="arview-product-image" />
       <div className="arview-product-meta">
