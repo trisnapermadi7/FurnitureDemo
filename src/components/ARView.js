@@ -278,6 +278,7 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
+    alert('Tombol diklik!');
     setIsCleaningUp(true); // Tampilkan canvas selama cleanup
     await cleanupAR();
     setArActive(false);    // Baru hilangkan canvas
