@@ -239,9 +239,9 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
+  cleanupAR();
   setArActive(false);
   setArSupported(true);
-  cleanupAR();
   navigate('/furniture');
 }
 
