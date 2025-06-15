@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -10,6 +10,9 @@ import furnitureData from '../data/furnitureData';
 function ARView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const sceneRef = useRef();
+  const cameraRef = useRef();
+  const rendererRef = useRef();
   const [arSupported, setArSupported] = useState(true);
   const [arActive, setArActive] = useState(true);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
@@ -46,29 +49,18 @@ function ARView() {
   }, []);
 
 function cleanupAR() {
-  return new Promise((resolve) => {
-    if (renderer && renderer.xr && renderer.xr.getSession()) {
-      renderer.xr.getSession().end().then(() => {
-        if (renderer && renderer.dispose) renderer.dispose();
-        // Hapus ARButton
-        const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
-        if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
-        // Hapus ARButton jika masih ada di DOM (id)
-        const arBtnById = document.getElementById('ARButton');
-        if (arBtnById && arBtnById.parentNode) arBtnById.parentNode.removeChild(arBtnById);
+    return new Promise((resolve) => {
+      if (rendererRef.current && rendererRef.current.xr && rendererRef.current.xr.getSession()) {
+        rendererRef.current.xr.getSession().end().then(() => {
+          if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
+          resolve();
+        });
+      } else {
+        if (rendererRef.current && rendererRef.current.dispose) rendererRef.current.dispose();
         resolve();
-      });
-    } else {
-      if (renderer && renderer.dispose) renderer.dispose();
-      // Hapus ARButton
-      const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
-      if (arBtn && arBtn.parentNode) arBtn.parentNode.removeChild(arBtn);
-      const arBtnById = document.getElementById('ARButton');
-      if (arBtnById && arBtnById.parentNode) arBtnById.parentNode.removeChild(arBtnById);
-      resolve();
-    }
-  });
-}
+      }
+    });
+  }
 
   useEffect(() => {
     // Update index jika id berubah
@@ -101,6 +93,18 @@ function cleanupAR() {
       0.01,
       20
     );
+
+    sceneRef.current = new THREE.Scene();
+    cameraRef.current = new THREE.PerspectiveCamera(
+      70,
+      window.innerWidth / window.innerHeight,
+      0.01,
+      20
+    );
+    rendererRef.current = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+    });
 
     const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     light.position.set(0.5, 1, 0.25);
