@@ -121,7 +121,7 @@ function cleanupAR() {
       scene.add(light);
       scene.remove(xrLight);
     });
-
+    renderer.xr.enabled = true;
     if (arSupported) {
     let arButton = ARButton.createButton(renderer, {
       requiredFeatures: ["hit-test"],
@@ -130,6 +130,19 @@ function cleanupAR() {
     });
     arButton.style.bottom = "22%";
     document.body.appendChild(arButton);
+
+    renderer.xr.addEventListener('sessionstart', () => {
+      const session = renderer.xr.getSession();
+      if (session) {
+        session.addEventListener('end', () => {
+          // Cleanup AR dan kembali ke galeri
+          setArActive(false);
+          setTimeout(() => {
+            navigate('/furniture');
+          }, 100);
+        });
+      }
+    });
   }
 
     for (let i = 0; i < models.length; i++) {
