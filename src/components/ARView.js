@@ -14,7 +14,6 @@ function ARView() {
   const [arActive, setArActive] = useState(true);
   const [navbarOpen, setNavbarOpen] = useState(true);
 
-  // Model dan scale
   const models = [
     "/Kabinet_AjengDiahPramesti.glb",
     "/Kasur_HariOctavianDelrossi.glb", 
@@ -26,7 +25,6 @@ function ARView() {
   const modelScaleFactor = [0.01, 0.01, 0.005, 0.01, 0.01, 0.01];
   let items = [];
 
-  // Cari index model berdasarkan id furniture
   const initialIndex = furnitureData.findIndex(f => f.id === Number(id));
   const [itemSelectedIndex, setItemSelectedIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
 
@@ -52,12 +50,10 @@ function cleanupAR() {
   if (renderer && renderer.dispose) {
     renderer.dispose();
   }
-  // Hapus ARButton dari three.js (class)
   const arBtn = document.querySelector('.ar-button, .webxr-ar-button');
   if (arBtn && arBtn.parentNode) {
     arBtn.parentNode.removeChild(arBtn);
   }
-  // Hapus ARButton jika masih ada di DOM (id)
   const arBtnById = document.getElementById('ARButton');
   if (arBtnById && arBtnById.parentNode) {
     arBtnById.parentNode.removeChild(arBtnById);
@@ -66,10 +62,8 @@ function cleanupAR() {
 }
 
   useEffect(() => {
-    // Update index jika id berubah
     if (initialIndex !== -1) setItemSelectedIndex(initialIndex);
 
-  // Tunggu sampai canvas sudah ada di DOM
   if (arActive) {
     const waitForCanvas = setInterval(() => {
       const myCanvas = document.getElementById("canvas");
@@ -138,7 +132,7 @@ function cleanupAR() {
       arButton.style.position = "absolute";
       arButton.style.left = "50%";
       arButton.style.transform = "translateX(-50%)";
-      arButton.style.bottom = "335px"; // Atur jarak dari bawah info bar
+      arButton.style.bottom = "335px"; 
       arButton.style.zIndex = "1001";
       arButton.style.opacity = "1";
       arButton.style.width = "150px";
@@ -150,7 +144,7 @@ function cleanupAR() {
         const session = renderer.xr.getSession();
         if (session) {
           session.addEventListener('end', () => {
-          document.body.style.display = 'block'; // Pastikan body tampil lagi
+          document.body.style.display = 'block'; 
           setArActive(false);
           setTimeout(() => {
             navigate('/furniture');
