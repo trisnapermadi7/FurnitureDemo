@@ -11,9 +11,9 @@ function FurnitureList() {
     <div className="furniture-list-container">
       <header className="list-header">
         <h2>
-          <span role="img" aria-label="furniture">🪑</span> Furniture Collection
+          <span role="img" aria-label="furniture">🪑</span> Koleksi Furnitur
         </h2>
-        <p>Click on any item to view in Augmented Reality!</p>
+        <p>Klik pada salah satu item untuk melihatnya dalam Augmented Reality!</p>
       </header>
       <div className="furniture-grid">
         {furnitureData.map((item) => (

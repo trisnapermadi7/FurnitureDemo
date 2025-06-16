@@ -273,7 +273,7 @@ function cleanupAR() {
       className="back-to-gallery-btn"
       onClick={handleBackToGallery}
     >
-      ← Back to Gallery
+      ← Kembali ke Galeri
     </button>
     {arActive && <canvas id="canvas"></canvas>}
     <div className={`arview-product-info${navbarOpen ? '' : ' closed'}`}>
@@ -286,7 +286,7 @@ function cleanupAR() {
       <img src={product.image} alt={product.name} className="arview-product-image" />
       <div className="arview-product-meta">
         <h3 className="arview-product-title">{product.name}</h3>
-        <div className="arview-product-size">Size: {product.size}</div>
+        <div className="arview-product-size">Ukuran: {product.size}</div>
         <div className="arview-product-desc">{product.description}</div>
       </div>
     </div>
