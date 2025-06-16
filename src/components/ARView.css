@@ -83,7 +83,7 @@ code {
 
 /* Navbar info produk animasi buka/tutup */
 .arview-product-info {
-  position: fixed;
+  position: relative;
   bottom: 0;
   left: 0;
   width: 100vw;
@@ -94,8 +94,8 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 120;
   transition: transform 0.3s, opacity 0.3s;
+  z-index: 1000;
 }
 
 .arview-product-info.closed {

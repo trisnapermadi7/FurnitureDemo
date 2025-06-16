@@ -131,6 +131,19 @@ function cleanupAR() {
       domOverlay: { root: document.body },
     });
     arButton.style.bottom = "22%";
+    setTimeout(() => {
+    const infoDiv = document.querySelector('.arview-product-info');
+    if (infoDiv && arButton) {
+      infoDiv.appendChild(arButton);
+      arButton.style.position = "absolute";
+      arButton.style.left = "50%";
+      arButton.style.transform = "translateX(-50%)";
+      arButton.style.bottom = "335px"; // Atur jarak dari bawah info bar
+      arButton.style.zIndex = "1001";
+      arButton.style.opacity = "1";
+      arButton.style.width = "150px";
+    }
+  }, 100);
     document.body.appendChild(arButton);
 
         renderer.xr.addEventListener('sessionstart', () => {
@@ -254,9 +267,7 @@ function cleanupAR() {
   if (!product) return <div>Produk tidak ditemukan.</div>;
 
   const handleBackToGallery = async () => {
-  // 1. Cleanup AR dulu
   await cleanupAR();
-  // 2. Baru hilangkan canvas dan navigate
   setArActive(false);
   setArSupported(true);
   navigate('/furniture');
